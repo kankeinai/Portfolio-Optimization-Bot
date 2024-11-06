@@ -3,12 +3,6 @@ using Gurobi
 using CSV
 using DataFrames
 
-function benefit_to_profit(benefit::Union{Vector{Float64}, Vector{Int}})
-
-    return benefit.*10
-
-end
-
 function portfolio_optimization(path::String, M::Int,  budget::Union{Float64, Int}; analysis::Bool = false, advanced::Bool = false, 
     U::Union{Int, Nothing} = nothing, threshold::Union{Float64, Nothing, Int} = nothing, tolerance_level::Union{Float64, Nothing} = nothing, max_violation::Union{Float64, Nothing, Int} = nothing)
     
@@ -16,7 +10,7 @@ function portfolio_optimization(path::String, M::Int,  budget::Union{Float64, In
     df = CSV.read(path, DataFrame)
 
     projects = df[:, :project]
-    profit =  benefit_to_profit(df[:, :benefit])
+    profit =  df[:, :profit]
     costs = df[:, :cost]
     risks = df[:, :risk]
 
@@ -26,7 +20,7 @@ function portfolio_optimization(path::String, M::Int,  budget::Union{Float64, In
     try
         s === missing || isempty(s) ? nothing : Array(parse.(Int, split(strip(s, ['{', '}']), ",")))
     catch
-        nothing  # Return an empty set if any error occurs
+        nothing  
     end
     for s in df.dependence
     ]
@@ -46,7 +40,7 @@ function portfolio_optimization(path::String, M::Int,  budget::Union{Float64, In
         if df[k, :dependence] ≠ nothing
             l = length(df[k, :dependence])
             if l>0 
-                @constraint(model, sum(x[df[k, :dependence][i]] for i in 1:l) + x[k] == l + 1)
+                @constraint(model, sum(x[df[k, :dependence][i]] for i in 1:l) >= l * x[k])
             end
         end
     end
@@ -92,7 +86,7 @@ function portfolio_optimization(path::String, M::Int,  budget::Union{Float64, In
                     if df[k, :dependence] ≠ nothing
                         l = length(df[k, :dependence])
                         if l>0 
-                            @constraint(model, sum(x[df[k, :dependence][i]] for i in 1:l) + x[k] == l + 1)
+                            @constraint(model, sum(x[df[k, :dependence][i]] for i in 1:l) >= l * x[k])
                         end
                     end
                 end
@@ -117,7 +111,7 @@ function portfolio_optimization(path::String, M::Int,  budget::Union{Float64, In
                 if df[k, :dependence] ≠ nothing
                     l = length(df[k, :dependence])
                     if l>0 
-                        @constraint(model, sum(x[df[k, :dependence][i]] for i in 1:l) + x[k] == l + 1)
+                        @constraint(model, sum(x[df[k, :dependence][i]] for i in 1:l) >= l * x[k])
                     end
                 end
             end
@@ -131,9 +125,9 @@ function portfolio_optimization(path::String, M::Int,  budget::Union{Float64, In
             test_revenue = (success_scenarios_test .* stockh_x)' * profit .- sum(stockh_x .* costs);
 
             if advanced
-                return (stockh_x, stockh_profit, revenue,  perfect_revenue, price_of_perfect_information,  price_of_scenarios, test_revenue, prob)
+                return (stockh_x, stockh_profit, revenue,  perfect_revenue, price_of_perfect_information,  price_of_scenarios, test_revenue, final_costs, prob)
             else
-                return (stockh_x, stockh_profit, revenue,  perfect_revenue, price_of_perfect_information,  price_of_scenarios, test_revenue)
+                return (stockh_x, stockh_profit, revenue,  perfect_revenue, price_of_perfect_information,  price_of_scenarios, test_revenue, final_costs)
             end
         else
             if advanced

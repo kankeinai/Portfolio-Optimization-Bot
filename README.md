@@ -92,10 +92,6 @@ A sample report is provided in `sample_report.pdf`. This document demonstrates t
 4. Push to the branch (`git push origin feature/YourFeature`).
 5. Open a pull request.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Contact
 
-For questions or suggestions, contact [Your Name](mailto:youremail@example.com).
+For questions or suggestions, contact [Milana](milka3341@gmail.com).

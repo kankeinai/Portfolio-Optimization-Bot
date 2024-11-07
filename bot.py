@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from aiogram import Bot, Dispatcher, types, Router
+from aiogram import Bot, Dispatcher, types, Router, F
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import FSInputFile
 from aiogram.fsm.context import FSMContext
@@ -13,8 +13,6 @@ from utils import *
 from keyboards import *
 import random
 import numpy as np
-
-
 
 class Form(StatesGroup):
     projects_data = State()
@@ -34,6 +32,7 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher()
 logging.basicConfig(format=u'%(filename)s [LINE:%(lineno)d] #%(levelname)-8s [%(asctime)s]  %(message)s',
                     level=logging.INFO,)
+
 
 
 # Хэндлер на команду /start
@@ -72,6 +71,10 @@ async def cmd_start(message: types.Message):
 
 @dp.message(Command("help"))
 async def cmd_help(message: types.Message):
+    global folder_name
+    if folder_name=="":
+        folder_name = "user_"+str(message.from_user.id)
+        await repository_exist(folder_name)
 
     await message.answer("Oh, wow! You are already here.")
     await bot.send_sticker(chat_id=message.chat.id, sticker=random.choice(STICKERS['celebrate']))
@@ -92,6 +95,7 @@ async def cmd_help(message: types.Message):
 
 @dp.message(Command("optimize"))
 async def cmd_optimize(message: types.Message, state: FSMContext):
+    
     await message.answer("Lets optimize! You can abort it by writing /abort.")
     await bot.send_sticker(chat_id=message.chat.id, sticker=random.choice(STICKERS['celebrate']))
     text = [
@@ -160,7 +164,7 @@ async def handle_data_documents(message: types.Message, state: FSMContext):
             else:
                 await message.answer(f"File is accepted! If you finished uploading, text 'next'", reply_markup=next_keyboard()) 
         else:
-            await message.answer(f"File is not accepted, only .csv, .xlsx files are accepted.") 
+            await message.answer(f"Only .csv, .xlsx files are accepted.") 
             if np.random.rand()>=0.5:
                     await bot.send_sticker(chat_id=message.chat.id, sticker=random.choice(STICKERS['error']))
     if message.text:
@@ -203,7 +207,7 @@ async def param_document(message: types.Message, state: FSMContext):
             await state.set_state(Form.advanced)
 
         elif text == "yes":
-            await message.answer("You need to provide me 3 parameters:\nM (integer number, U>0), U (integer number, U>0), budget\n\nExample input:\n100, 20, 100000")
+            await message.answer("You need to provide me 3 parameters:\nM (integer number, M>0), U (integer number, U>0), budget\n\nExample input:\n100, 20, 100000")
             await state.set_state(Form.simple)
         elif text == "/abort":
             await repository_exist(folder_name)
@@ -228,11 +232,16 @@ async def param_document(message: types.Message, state: FSMContext):
             M, U, budget = map(to_number, text_no_spaces.split(','))
 
             if U>0 and M>0:
-                await state.update_data(params=(M, U, budget))
-                await message.answer("Great! Do you want to use advanced formulation?", reply_markup = yes_no_keyboard())
-                if np.random.rand()>=0.5:
-                        await bot.send_sticker(chat_id=message.chat.id, sticker=random.choice(STICKERS['yes']))
-                await state.set_state(Form.advanced)
+                if isinstance(U, int) and isinstance(M, int):
+                    await state.update_data(params=(M, U, budget))
+                    await message.answer("Great! Do you want to use advanced formulation?", reply_markup = yes_no_keyboard())
+                    if np.random.rand()>=0.5:
+                            await bot.send_sticker(chat_id=message.chat.id, sticker=random.choice(STICKERS['yes']))
+                    await state.set_state(Form.advanced)
+                else:
+                    await message.answer("Invalid input. M and U should be integers.")
+                    if np.random.rand()>=0.5:
+                        await bot.send_sticker(chat_id=message.chat.id, sticker=random.choice(STICKERS['error']))
             else:
                 await message.answer("Invalid input. M and U should be positive integers.")
                 if np.random.rand()>=0.5:
@@ -262,7 +271,7 @@ async def advanced(message: types.Message, state: FSMContext):
         elif text == "no":
             await message.answer("I will use simple formulation for these projects.")
             await state.update_data(advanced=False)
-            await message.answer("Great! Final question: do you want a full analysis report?", reply_markup= yes_no_keyboard())
+            await message.answer("Final question: do you want a full analysis report?", reply_markup= yes_no_keyboard())
             if np.random.rand()>=0.5:
                 await bot.send_sticker(chat_id=message.chat.id, sticker=random.choice(STICKERS['yes']))
             await state.set_state(Form.ready)
@@ -294,7 +303,7 @@ async def final_step(message: types.Message, state: FSMContext):
                 threshold, max_violation, tolerance = map(float, text_no_spaces.split(','))
                 if tolerance<=1 and tolerance>=0:
                     await state.update_data(advanced_params=(threshold, max_violation, tolerance))
-                    await message.answer("Great! Final question: do you want a full analysis report?", reply_markup = yes_no_keyboard())
+                    await message.answer("Final question: do you want a full analysis report?", reply_markup = yes_no_keyboard())
                     if np.random.rand()>=0.5:
                         await bot.send_sticker(chat_id=message.chat.id, sticker=random.choice(STICKERS['yes']))
                     await state.set_state(Form.ready)
@@ -366,13 +375,14 @@ async def final_step(message: types.Message, state: FSMContext):
         await message.answer("Sorry, I don't understand. Plese write 'yes'/'no'", reply_markup = yes_no_keyboard())
         await bot.send_sticker(chat_id=message.chat.id, sticker=STICKERS['dont'])
 
+
 @form_router.message(StateFilter(None))
 async def echo_message(message: types.Message, state: FSMContext):
 
     text = message.text
 
     if text == "/abort":
-       await message.answer("Sorry this command works only during optimization processing")
+       await message.answer("Sorry this command works only during optimization")
        if np.random.rand()>=0.5:
         await bot.send_sticker(chat_id=message.chat.id, sticker=random.choice(STICKERS['error']))
     elif text =="/start" or text =="/help" or text =="/optimize":

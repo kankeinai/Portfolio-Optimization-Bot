@@ -52,7 +52,7 @@ async def cmd_start(message: types.Message):
         folder_name = "user_"+str(message.from_user.id)
         await repository_exist(folder_name)
 
-    file_path = "instructions.pdf"
+    file_path = "example_files/instructions.pdf"
 
     if os.path.exists(file_path):
         # Use FSInputFile to load the file
@@ -107,7 +107,7 @@ async def cmd_optimize(message: types.Message, state: FSMContext):
     await repository_exist(folder_name)
 
     await message.answer(f"Here is example file.") 
-    file_path = "sample.xlsx"
+    file_path = "example_files/sample.xlsx"
 
     if os.path.exists(file_path):
         # Use FSInputFile to load the file

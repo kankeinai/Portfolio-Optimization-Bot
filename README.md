@@ -3,6 +3,8 @@
 
 This project provides a portfolio optimization solution through a Telegram bot interface, focusing on investment decisions with stochastic factors, constraints, and dependencies between projects. Users can interact with the bot to upload data, define parameters, and receive an optimization report.
 
+For creation of this README.MD file cudos to ChatGPT-4o
+
 ## Features
 
 - **Optimization**: Maximize portfolio revenue within a budget, considering each project's cost, benefit, and risk of failure.

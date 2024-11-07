@@ -59,7 +59,6 @@ function portfolio_optimization(path::String, M::Int,  budget::Union{Float64, In
 
     if status == MOI.OPTIMAL || status == MOI.FEASIBLE_POINT || status == MOI.LOCALLY_SOLVED
     
-        println("solution found.")
 
         if advanced
             prob = sum(value.(model[:v]))/M
@@ -125,15 +124,15 @@ function portfolio_optimization(path::String, M::Int,  budget::Union{Float64, In
             test_revenue = (success_scenarios_test .* stockh_x)' * profit .- sum(stockh_x .* costs);
 
             if advanced
-                return (stockh_x, stockh_profit, revenue,  perfect_revenue, price_of_perfect_information,  price_of_scenarios, test_revenue, final_costs, prob)
+                return (stockh_x, stockh_profit, revenue, final_costs, perfect_revenue, price_of_perfect_information,  price_of_scenarios, test_revenue, prob)
             else
-                return (stockh_x, stockh_profit, revenue,  perfect_revenue, price_of_perfect_information,  price_of_scenarios, test_revenue, final_costs)
+                return (stockh_x, stockh_profit, revenue,  final_costs, perfect_revenue, price_of_perfect_information,  price_of_scenarios, test_revenue)
             end
         else
             if advanced
-                return (stockh_x, stockh_profit, revenue, prob)
+                return (stockh_x, stockh_profit, revenue, final_costs, prob)
             else
-                return (stockh_x, stockh_profit, revenue)
+                return (stockh_x, stockh_profit, revenue, final_costs)
             end
     
         end

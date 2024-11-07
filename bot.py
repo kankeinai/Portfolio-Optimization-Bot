@@ -13,6 +13,7 @@ from utils import *
 from keyboards import *
 import random
 import numpy as np
+from time import time as current_time  # import time() function
 
 class Form(StatesGroup):
     projects_data = State()
@@ -25,6 +26,7 @@ class Form(StatesGroup):
 form_router = Router()
 folder_name = ""
 user_name = ""
+user_last_command = {}
 
 
 logging.basicConfig(level=logging.INFO)
@@ -38,6 +40,18 @@ logging.basicConfig(format=u'%(filename)s [LINE:%(lineno)d] #%(levelname)-8s [%(
 # Хэндлер на команду /start
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
+    global user_last_command
+    user_id = message.from_user.id
+    timestamp = current_time()
+
+    # Check if the command was sent recently (e.g., within 2 seconds)
+    if user_id in user_last_command and timestamp - user_last_command[user_id] < 2:
+        return  # Ignore the duplicate command
+
+    # Update the last command time
+    user_last_command[user_id] = timestamp
+
+
     global folder_name
     global user_name
 

@@ -5,6 +5,9 @@ This project provides a portfolio optimization solution through a Telegram bot i
 
 For creation of this README.MD file cudos to ChatGPT-4o
 
+You can find project demo here:
+https://youtu.be/6G5rUYQPuCg
+
 ## Features
 
 - **Optimization**: Maximize portfolio revenue within a budget, considering each project's cost, benefit, and risk of failure.

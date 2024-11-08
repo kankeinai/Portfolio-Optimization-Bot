@@ -11,7 +11,6 @@ import pandas as pd
 import subprocess
 import re
 
-default_settings =  {'budget': 100000, 'U': None, 'M':100, 'threshold':None, 'tolerance':None, "max_violation": None}
 def generate_random_string(n = 10):
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=n))
 
@@ -37,12 +36,6 @@ async def repository_exist(folder_name):
 
     os.makedirs(folder_name)
 
-
-async def process_param_doc(path):
-    return False
-
-async def process_files(paths):
-    return False
 
 async def generate_histogram(data):
 

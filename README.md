@@ -60,10 +60,6 @@ The bot generates an automatically formatted report (`example_files/sample_repor
 - Graphical distribution of revenue for training and test sets
 - Calculations of stochastic solution metrics
 
-### Example Report
-
-A sample report is provided in `example_files/sample_report.pdf`. This document demonstrates the final output structure, including revenue distributions, budget utilization, and recommended project investments.
-
 ## Files Overview
 
 - **bot.py**: The main bot script to handle Telegram interactions.
@@ -96,7 +92,3 @@ A sample report is provided in `example_files/sample_report.pdf`. This document 
 3. Commit your changes (`git commit -m 'Add your feature'`).
 4. Push to the branch (`git push origin feature/YourFeature`).
 5. Open a pull request.
-
-## Contact
-
-For questions or suggestions, contact [Milana](milka3341@gmail.com).

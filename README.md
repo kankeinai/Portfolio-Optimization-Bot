@@ -39,7 +39,7 @@ https://youtu.be/6G5rUYQPuCg
 
 ### Usage
 
-1. **Prepare Input Data**: Ensure that your input file (`.xlsx` or `.csv`) contains the columns: `project`, `benefit`, `cost`, `risk`, `dependence`. Refer to the example format in `instructions.pdf`.
+1. **Prepare Input Data**: Ensure that your input file (`.xlsx` or `.csv`) contains the columns: `project`, `benefit`, `cost`, `risk`, `dependence`. Refer to the example format in `example_files/sample.xlsx`.
 
 2. **Run the Bot**: Execute the bot with:
    ```bash
@@ -53,7 +53,7 @@ https://youtu.be/6G5rUYQPuCg
 
 ### Output
 
-The bot generates an automatically formatted report (`sample_report.pdf` for reference) that includes:
+The bot generates an automatically formatted report (`example_files/sample_report.pdf` for reference) that includes:
 
 - Project selection based on optimization
 - Expected revenue analysis for each scenario
@@ -62,7 +62,7 @@ The bot generates an automatically formatted report (`sample_report.pdf` for ref
 
 ### Example Report
 
-A sample report is provided in `sample_report.pdf`. This document demonstrates the final output structure, including revenue distributions, budget utilization, and recommended project investments.
+A sample report is provided in `example_files/sample_report.pdf`. This document demonstrates the final output structure, including revenue distributions, budget utilization, and recommended project investments.
 
 ## Files Overview
 

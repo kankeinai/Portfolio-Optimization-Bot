@@ -219,7 +219,7 @@ def check_data_csv(df):
     if set(required_columns).issubset(df.columns):
         print("All required columns are present.")
         if df[required_columns[:-1]].isnull().values.any():
-            output +="There are missing values in the DataFrame."
+            output +="\n-There are missing values in the DataFrame."
         else:
             print("There are no missing values in the DataFrame.")
             try:
@@ -230,17 +230,17 @@ def check_data_csv(df):
                 if df['risk'].between(0, 1).all():
                     print("All values in the 'risk' column are between 0 and 1.")
                 else:
-                    output +="\nSome values in the 'risk' column are outside the range 0 to 1"
+                    output +="\n-Some values in the 'risk' column are outside the range 0 to 1"
 
                 df['is_allowed_format'] = df['dependence'].apply(check_format)
                 if df['is_allowed_format'].all():
                     print("Everything is fine wilh dependence column.")
                 else:
-                    output +="\nSome values in dependence columns are not according to allowed format."
+                    output +="\n-Some values in dependence columns are not according to the allowed format."
             except:
-                output +="\nNon-numeric values found in cost, profit, risk columns."
+                output +="\n-Non-numeric values found in cost, profit, risk columns."
     else:
-        output += "\nSome required columns are missing."
+        output += "\n-Some required columns are missing."
     if output:
         return output
     else:
@@ -249,39 +249,46 @@ def check_data_csv(df):
 
 
 def process_file(folder, path):
+    try:
+        if path.endswith(".xlsx"):
+                
+            print(f"Processing file: {path}")
+            excel_data = pd.read_excel(path, sheet_name=None)
 
-    if path.endswith(".xlsx"):
-            
-        print(f"Processing file: {path}")
-        excel_data = pd.read_excel(path, sheet_name=None)
+            for sheet_name, data in excel_data.items():
 
-        for sheet_name, data in excel_data.items():
+                csv_file_path = os.path.join(folder, generate_random_string()+".csv")
+                data.to_csv(csv_file_path, index=False)
+                print(f"Saved sheet '{sheet_name}' to '{csv_file_path}'")
+                df = pd.read_csv(csv_file_path)
+                output = check_data_csv(df)
 
-            csv_file_path = os.path.join(folder, generate_random_string()+".csv")
-            data.to_csv(csv_file_path, index=False)
-            print(f"Saved sheet '{sheet_name}' to '{csv_file_path}'")
-            df = pd.read_csv(csv_file_path)
-            output = check_data_csv(df)
-
-            if output:
-                os.remove(csv_file_path)
-                os.remove(path)
-                return "In some of your tabs in .excel file there are errors:" + output
-            
-        os.remove(path)
-        return False
-
-    if path.endswith(".csv"):
-        new_path = os.path.join(folder, generate_random_string()+".csv")
-        
-        os.rename(path,new_path)
-        df = pd.read_csv(new_path)
-        output = check_data_csv(df)
-        if output:
-            os.remove(new_path)
-            return output
-        else:
+                if output:
+                    os.remove(csv_file_path)
+                    os.remove(path)
+                    return "In some of your tabs in .excel file there are errors:" + output
+                
+            os.remove(path)
             return False
+    except:
+        os.remove(path)
+        return "-File seems to be broken"
+    try:
+
+        if path.endswith(".csv"):
+            new_path = os.path.join(folder, generate_random_string()+".csv")
+            
+            os.rename(path, new_path)
+            df = pd.read_csv(new_path)
+            output = check_data_csv(df)
+            if output:
+                os.remove(new_path)
+                return output
+            else:
+                return False
+    except:
+        os.remove(new_path)
+        return "-File seems to be broken"
 
 def to_number(value):
     try:
